@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Git-Pack": {
+      "commandName": "Project",
+      "commandLineArgs": "-r \"C:\\Dev\\bluebonnet\" -z \"C:\\Temp\\Git-Pack\\branch.zip\" -b \"new-account-workflow\" -c \"master\" -overwrite"
+    }
+  }
+}
