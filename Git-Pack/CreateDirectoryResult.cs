@@ -2,17 +2,12 @@
 
 namespace Git_Pack
 {
-    public class CreateDirectoryResult : FileSystemOperationResult
+    public class CreateDirectoryResult : CommandResult, ICreateDirectoryResult
     {
         public string DirectoryPath
         {
             get;
-        }
-
-        public CreateDirectoryResult(string directoryPath, Exception error = null)
-            : base(error)
-        {
-            this.DirectoryPath = directoryPath;
+            set;
         }
 
         public override string ToString()

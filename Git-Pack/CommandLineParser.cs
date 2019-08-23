@@ -11,27 +11,29 @@ namespace Git_Pack
 
             for (var i = 0; i < args.Length; i+=2)
             {
-                if (args[i].ToLower() == "-r")
+                var arg = args[i].ToLower();
+
+                if (arg == "-r" || arg == "--repository")
                 {
                     cla.RepositoryPath = GetDirectoryPath(GetNextArgument(args, i));
                 }
-                else if (args[i].ToLower() == "-o")
+                else if (arg == "-d" || arg == "--output-directory")
                 {
                     cla.OutputDirectoryPath = GetDirectoryPath(GetNextArgument(args, i));
                 }
-                else if (args[i].ToLower() == "-z")
+                else if (arg == "-f" || arg == "--zip-file")
                 {
                     cla.OutputZipPath = GetFilePath(GetNextArgument(args, i));
                 }
-                else if (args[i].ToLower() == "-b")
+                else if (arg == "-b" || arg == "--branch")
                 {
                     cla.BranchWithChanges = GetBranchName(GetNextArgument(args, i));
                 }
-                else if (args[i].ToLower() == "-c")
+                else if (arg == "-c" || arg == "--comparable-branch")
                 {
                     cla.ComparableBranch = GetBranchName(GetNextArgument(args, i));
                 }
-                else if (args[i].ToLower() == "-overwrite")
+                else if (arg == "-o" || arg == "--overwrite")
                 {
                     cla.Overwrite = true;
                     i--;

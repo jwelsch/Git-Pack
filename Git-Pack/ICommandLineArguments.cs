@@ -12,6 +12,12 @@
             get;
         }
 
+        string OutputZipPath
+        {
+            get;
+            set;
+        }
+
         string BranchWithChanges
         {
             get;

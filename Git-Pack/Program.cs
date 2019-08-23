@@ -8,7 +8,7 @@ namespace Git_Pack
         //
         // Command line syntax
         //
-        // Git-Pack -r "\directory\with\repo" (-o "\output\directory" | -z "\output\zip\file") -b "branch-with-changes" -c "branch-to-compare-against" [-overwrite]
+        // Git-Pack -r "\directory\with\repo" (-d "\output\directory" | -f "\output\zip\file") -b "branch-with-changes" -c "branch-to-compare-against" [-overwrite]
         //
 
         private static readonly string GitBinFolderName = @"Git\Bin";
@@ -23,40 +23,27 @@ namespace Git_Pack
 
                 var gitExePath = FileResolver.FindInProgramFiles(GitBinFolderName, GitExeName);
 
-                var command = new GitChangedFilesCommand();
-                var changedFileList = command.Execute(gitExePath, cla.RepositoryPath, cla.BranchWithChanges, cla.ComparableBranch);
+                var gitCommand = new GitChangedFilesCommand();
+                var changedFileList = gitCommand.Execute(gitExePath, cla.RepositoryPath, cla.BranchWithChanges, cla.ComparableBranch);
 
-                Console.WriteLine($"Found {changedFileList.Count} changed files.{Environment.NewLine}");
-
-                var copier = new FileCopier();
-                var result = copier.Copy(cla.RepositoryPath, changedFileList, cla.OutputDirectoryPath, cla.Overwrite, s => Console.WriteLine(s));
-
+                Console.WriteLine($"Found {changedFileList.Count} changed {"file".Pluralize("files", changedFileList.Count)}.");
                 Console.WriteLine();
 
-                if (result.FileCopySuccesses.Count > 0)
+                ICommand command = null;
+
+                if (!string.IsNullOrWhiteSpace(cla.OutputDirectoryPath))
                 {
-                    Console.WriteLine($"Copied {result.FileCopySuccesses.Count} files successfully.");
+                    command = new FileCopyCommand(cla.RepositoryPath, changedFileList, cla.OutputDirectoryPath, cla.Overwrite);
+                }
+                else if (!string.IsNullOrWhiteSpace(cla.OutputZipPath))
+                {
+                    command = new FileZipCommand(cla.RepositoryPath, changedFileList, cla.OutputZipPath, cla.Overwrite);
                 }
 
-                if (result.FileCopyErrors.Count > 0)
-                {
-                    Console.WriteLine($"Failed to copy {result.FileCopyErrors.Count} files.");
-                }
+                var result = command.Execute(s => Console.WriteLine(s));
 
-                if (result.CreateDirectorySuccesses.Count > 0)
-                {
-                    Console.WriteLine($"Created {result.CreateDirectorySuccesses.Count} directories successfully.");
-                }
-
-                if (result.CreateDirectoryErrors.Count > 0)
-                {
-                    Console.WriteLine($"Failed to create {result.CreateDirectoryErrors.Count} directories.");
-                }
-
-                if (result.GenericErrors.Count > 0)
-                {
-                    Console.WriteLine($"Encountered {result.GenericErrors.Count} other errors.");
-                }
+                Console.WriteLine();
+                Console.WriteLine(result.ToString());
             }
             catch (Exception ex)
             {
