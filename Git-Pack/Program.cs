@@ -8,7 +8,7 @@ namespace Git_Pack
         //
         // Command line syntax
         //
-        // Git-Pack -r "\directory\with\repo" (-d "\output\directory" | -f "\output\zip\file") -b "branch-with-changes" -c "branch-to-compare-against" [-overwrite]
+        // Git-Pack -r "\directory\with\repo" (-d "\output\directory" | -f "\output\zip\file") -b "branch-with-changes" -c "branch-to-compare-against" [-overwrite] [-u "\back\up\directory"]
         //
 
         private static readonly string GitBinFolderName = @"Git\Bin";
@@ -33,7 +33,7 @@ namespace Git_Pack
 
                 if (!string.IsNullOrWhiteSpace(cla.OutputDirectoryPath))
                 {
-                    command = new FileCopyCommand(cla.RepositoryPath, changedFileList, cla.OutputDirectoryPath, cla.Overwrite);
+                    command = new FileCopyCommand(cla.RepositoryPath, changedFileList, cla.OutputDirectoryPath, cla.BackupDirectory, cla.Overwrite);
                 }
                 else if (!string.IsNullOrWhiteSpace(cla.OutputZipPath))
                 {

@@ -2,7 +2,7 @@
   "profiles": {
     "Git-Pack": {
       "commandName": "Project",
-      "commandLineArgs": "-r \"C:\\Dev\\bluebonnet\" -d \"C:\\Temp\\Git-Pack\" -b \"new-account-workflow\" -c \"master\""
+      "commandLineArgs": "-r \"C:\\Dev\\bluebonnet\" -d \"C:\\Temp\\Git-Pack\" -b \"new-account-workflow\" -c \"master\" -o"
     }
   }
 }

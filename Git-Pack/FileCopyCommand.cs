@@ -22,27 +22,36 @@ namespace Git_Pack
             get;
         }
 
+        public string BackupTargetPath
+        {
+            get;
+        }
+
         public bool Overwrite
         {
             get;
         }
 
-        public FileCopyCommand(string baseSourcePath, IEnumerable<string> filePaths, string targetPath, bool overwrite = false)
+        public FileCopyCommand(string baseSourcePath, IEnumerable<string> filePaths, string targetPath, string backupTargetPath, bool overwrite = false)
         {
             this.BaseSourcePath = baseSourcePath;
             this.FilePaths = filePaths;
             this.TargetPath = targetPath;
+            this.BackupTargetPath = backupTargetPath;
             this.Overwrite = overwrite;
         }
 
         public ICommandResult Execute(Action<string> reporter = null)
         {
             var operationResult = new FileCopyResult();
+            var doBackup = !string.IsNullOrEmpty(this.BackupTargetPath);
 
             try
             {
-                var targetFilePath = string.Empty;
-                var sourceFilePath = string.Empty;
+                string targetFilePath = null;
+                string sourceFilePath = null;
+                string backupDirectoryPath = null;
+                string backupFilePath = null;
                 var count = this.FilePaths.Count();
                 var i = 0;
 
@@ -82,13 +91,38 @@ namespace Git_Pack
                         TargetPath = targetFilePath
                     };
 
-                    try
+                    if (this.BackupTargetPath != null && File.Exists(targetFilePath))
                     {
-                        File.Copy(sourceFilePath, targetFilePath, this.Overwrite);
+                        backupDirectoryPath = Path.Combine(this.BackupTargetPath, directoryPath);
+                        backupFilePath = Path.Combine(backupDirectoryPath, fileName);
+
+                        fileCopyEntryResult.BackupPath = backupFilePath;
+
+                        if (!Directory.Exists(backupDirectoryPath))
+                        {
+                            Directory.CreateDirectory(backupDirectoryPath);
+                        }
+
+                        try
+                        {
+                            File.Copy(targetFilePath, backupFilePath, this.Overwrite);
+                        }
+                        catch (Exception ex)
+                        {
+                            fileCopyEntryResult.Error = ex;
+                        }
                     }
-                    catch (Exception ex)
+
+                    if (!fileCopyEntryResult.HasError)
                     {
-                        fileCopyEntryResult.Error = ex;
+                        try
+                        {
+                            File.Copy(sourceFilePath, targetFilePath, this.Overwrite);
+                        }
+                        catch (Exception ex)
+                        {
+                            fileCopyEntryResult.Error = ex;
+                        }
                     }
 
                     operationResult.FileCopyResults.Add(fileCopyEntryResult);

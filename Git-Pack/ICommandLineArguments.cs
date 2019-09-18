@@ -32,5 +32,10 @@
         {
             get;
         }
+
+        string BackupDirectory
+        {
+            get;
+        }
     }
 }

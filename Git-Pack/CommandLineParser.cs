@@ -15,11 +15,11 @@ namespace Git_Pack
 
                 if (arg == "-r" || arg == "--repository")
                 {
-                    cla.RepositoryPath = GetDirectoryPath(GetNextArgument(args, i));
+                    cla.RepositoryPath = GetDirectoryPath(GetNextArgument(args, i), true);
                 }
                 else if (arg == "-d" || arg == "--output-directory")
                 {
-                    cla.OutputDirectoryPath = GetDirectoryPath(GetNextArgument(args, i));
+                    cla.OutputDirectoryPath = GetDirectoryPath(GetNextArgument(args, i), false);
                 }
                 else if (arg == "-f" || arg == "--zip-file")
                 {
@@ -37,6 +37,10 @@ namespace Git_Pack
                 {
                     cla.Overwrite = true;
                     i--;
+                }
+                else if (arg == "-u" || arg == "--backup")
+                {
+                    cla.BackupDirectory = GetDirectoryPath(GetNextArgument(args, i), false);
                 }
                 else
                 {
@@ -79,7 +83,7 @@ namespace Git_Pack
             return args[newIndex];
         }
 
-        private string GetDirectoryPath(string arg)
+        private string GetDirectoryPath(string arg, bool mustExist)
         {
             if (arg == null)
             {
@@ -91,7 +95,7 @@ namespace Git_Pack
                 throw new ArgumentException(nameof(arg), "Path cannot be empty.");
             }
 
-            return Directory.Exists(arg) ? arg : throw new DirectoryNotFoundException($"Path not found: {arg}");
+            return mustExist && !Directory.Exists(arg) ? throw new DirectoryNotFoundException($"Path not found: {arg}") : arg;
         }
 
         private string GetFilePath(string arg)

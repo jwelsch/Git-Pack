@@ -38,12 +38,18 @@
             set;
         }
 
+        public string BackupDirectory
+        {
+            get;
+            set;
+        }
+
         public CommandLineArguments()
         {
 
         }
 
-        public CommandLineArguments(string repositoryDirectory, string outputPath, bool isOutputDirectory, string branchWithChanges, string comparableBranch, bool overwrite)
+        public CommandLineArguments(string repositoryDirectory, string outputPath, bool isOutputDirectory, string branchWithChanges, string comparableBranch, bool overwrite, string backupDirectory)
         {
             this.RepositoryPath = repositoryDirectory;
             this.OutputDirectoryPath = isOutputDirectory ? outputPath : string.Empty;
@@ -51,6 +57,7 @@
             this.BranchWithChanges = branchWithChanges;
             this.ComparableBranch = comparableBranch;
             this.Overwrite = overwrite;
+            this.BackupDirectory = backupDirectory;
         }
     }
 }

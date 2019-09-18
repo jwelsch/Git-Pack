@@ -11,5 +11,10 @@
         {
             get;
         }
+
+        string BackupPath
+        {
+            get;
+        }
     }
 }

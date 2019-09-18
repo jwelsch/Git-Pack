@@ -16,6 +16,12 @@ namespace Git_Pack
             set;
         }
 
+        public string BackupPath
+        {
+            get;
+            set;
+        }
+
         public override string ToString()
         {
             if (this.Error == null)
