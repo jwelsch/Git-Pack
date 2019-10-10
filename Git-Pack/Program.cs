@@ -1,5 +1,9 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.FileExtensions;
+using Microsoft.Extensions.Configuration.Xml;
+using System;
 using System.Diagnostics;
+using System.IO;
 
 namespace Git_Pack
 {
@@ -11,17 +15,21 @@ namespace Git_Pack
         // Git-Pack -r "\directory\with\repo" (-d "\output\directory" | -f "\output\zip\file") -b "branch-with-changes" -c "branch-to-compare-against" [-overwrite] [-u "\back\up\directory"]
         //
 
-        private static readonly string GitBinFolderName = @"Git\Bin";
-        private static readonly string GitExeName = "git.exe";
+        private static readonly string DefaultGitExePath = $"Git{Path.DirectorySeparatorChar}Bin{Path.DirectorySeparatorChar}git.exe";
 
         static void Main(string[] args)
         {
             try
             {
+                var config = new ConfigurationBuilder()
+                    .SetBasePath(Environment.CurrentDirectory)
+                    .AddXmlFile("App.config")
+                    .Build();
+
+                var gitExePath = GetFullGitExePath(config);
+
                 var parser = new CommandLineParser();
                 var cla = parser.Parse(args);
-
-                var gitExePath = FileResolver.FindInProgramFiles(GitBinFolderName, GitExeName);
 
                 var gitCommand = new GitChangedFilesCommand();
                 var changedFileList = gitCommand.Execute(gitExePath, cla.RepositoryPath, cla.BranchWithChanges, cla.ComparableBranch);
@@ -50,6 +58,18 @@ namespace Git_Pack
                 Trace.WriteLine(ex.Message);
                 Console.WriteLine(ex.Message);
             }
+        }
+
+        private static string GetFullGitExePath(IConfigurationRoot config)
+        {
+            var gitExePath = config["gitPath"];
+
+            if (string.IsNullOrWhiteSpace(gitExePath))
+            {
+                gitExePath = DefaultGitExePath;
+            }
+
+            return FileResolver.Find(gitExePath);
         }
     }
 }

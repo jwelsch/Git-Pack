@@ -10,19 +10,48 @@ namespace Git_Pack
         {
             var pathBuilder = new StringBuilder();
 
-            foreach (var path in paths)
+            foreach (var p in paths)
             {
-                var partial = Path.Combine(pathBuilder.ToString(), path);
+                var partial = Path.Combine(pathBuilder.ToString(), p);
                 pathBuilder.Clear();
                 pathBuilder.Append(partial);
             }
 
-            if (!File.Exists(pathBuilder.ToString()))
+            var path = pathBuilder.ToString();
+            var exists = File.Exists(path);
+
+            if (!exists)
             {
-                throw new FileNotFoundException($"Could not find git executable.", pathBuilder.ToString());
+                if (!Path.IsPathRooted(path))
+                {
+                    var absolutePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), path);
+
+                    exists = File.Exists(absolutePath);
+
+                    if (exists)
+                    {
+                        path = absolutePath;
+                    }
+                    else
+                    {
+                        absolutePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), path);
+
+                        exists = File.Exists(absolutePath);
+
+                        if (exists)
+                        {
+                            path = absolutePath;
+                        }
+                    }
+                }
+
+                if (!exists)
+                {
+                    throw new FileNotFoundException($"Could not find git executable.", path);
+                }
             }
 
-            return pathBuilder.ToString();
+            return path;
         }
 
         public static string FindInProgramFiles(params string[] paths)
